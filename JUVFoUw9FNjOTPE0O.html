@@ -1,0 +1,306 @@
+<html><head><base href="/" />
+<meta charset="UTF-8">
+<title>Generador de Frases Estoicas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Philosopher&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Philosopher', sans-serif;
+    color: #fff;
+    padding: 2rem;
+  }
+
+  .container {
+    max-width: 800px;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .controls {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  input, select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 150px;
+    margin: 0 1rem;
+    border: none;
+    border-radius: 4px;
+  }
+
+  button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  button:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+  }
+
+  .quote-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-top: 2rem;
+    backdrop-filter: blur(5px);
+    max-width: 600px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .loading {
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Generador de Frases Estoicas</h1>
+    <div class="controls">
+      <label>Número de palabras:</label>
+      <input type="number" id="wordCount" min="3" max="30" value="10">
+      <label>Temática:</label>
+      <select id="theme">
+        <option value="sabiduria">Sabiduría</option>
+        <option value="amor">Amor</option>
+        <option value="vida">Vida</option>
+        <option value="dolor">Dolor</option>
+        <option value="perdida">Pérdida</option>
+        <option value="humildad">Humildad</option>
+      </select>
+      <button onclick="generateQuote()">Generar Frase</button>
+    </div>
+    <div class="quote-container" id="quoteDisplay">
+      Tu frase estoica aparecerá aquí...
+    </div>
+  </div>
+
+<script>
+const phrases = {
+  sabiduria: {
+    beginnings: [
+      "La sabiduría se encuentra en",
+      "El camino del sabio es",
+      "La verdadera comprensión emerge de",
+      "El conocimiento profundo revela que",
+      "La mente iluminada entiende que"
+    ],
+    middles: [
+      "contemplar con claridad",
+      "comprender profundamente",
+      "meditar sobre",
+      "estudiar con paciencia",
+      "reflexionar acerca de"
+    ],
+    endings: [
+      "la naturaleza de nuestra existencia",
+      "los principios fundamentales",
+      "la verdad inherente en todo",
+      "el camino del conocimiento",
+      "la esencia de la realidad"
+    ]
+  },
+  amor: {
+    beginnings: [
+      "El amor verdadero reside en",
+      "La fortaleza del amor está en",
+      "El afecto noble surge de",
+      "La conexión genuina nace de",
+      "El amor virtuoso se manifiesta en"
+    ],
+    middles: [
+      "aceptar con serenidad",
+      "comprender con el corazón",
+      "cultivar pacientemente",
+      "nutrir con sabiduría",
+      "honrar sinceramente"
+    ],
+    endings: [
+      "los vínculos que nos unen",
+      "la pureza de los sentimientos",
+      "la verdad del corazón",
+      "la conexión con otros",
+      "el amor incondicional"
+    ]
+  },
+  vida: {
+    beginnings: [
+      "La vida nos enseña que",
+      "El sentido de la existencia está en",
+      "El camino de la vida revela",
+      "La verdadera existencia requiere",
+      "El flujo de la vida muestra"
+    ],
+    middles: [
+      "fluir con gracia ante",
+      "aceptar con dignidad",
+      "enfrentar con valor",
+      "apreciar plenamente",
+      "vivir conscientemente"
+    ],
+    endings: [
+      "cada momento presente",
+      "el devenir natural",
+      "los ciclos de la existencia",
+      "el flujo constante del tiempo",
+      "la danza de la vida"
+    ]
+  },
+  dolor: {
+    beginnings: [
+      "El dolor nos enseña que",
+      "La fortaleza ante el sufrimiento es",
+      "El camino a través del dolor revela",
+      "La superación del sufrimiento requiere",
+      "La transformación del dolor permite"
+    ],
+    middles: [
+      "aceptar con valentía",
+      "transformar con sabiduría",
+      "trascender mediante",
+      "comprender profundamente",
+      "enfrentar con coraje"
+    ],
+    endings: [
+      "las pruebas que nos forjan",
+      "el crecimiento del espíritu",
+      "la fortaleza interior",
+      "la templanza del alma",
+      "la superación personal"
+    ]
+  },
+  perdida: {
+    beginnings: [
+      "La pérdida nos enseña sobre",
+      "El vacío nos muestra que",
+      "La ausencia nos recuerda",
+      "El desprendimiento revela",
+      "La aceptación de la pérdida trae"
+    ],
+    middles: [
+      "aceptar con dignidad",
+      "comprender la naturaleza de",
+      "encontrar paz en",
+      "trascender a través de",
+      "hallar fortaleza en"
+    ],
+    endings: [
+      "lo transitorio de la existencia",
+      "la naturaleza del cambio",
+      "el ciclo natural de la vida",
+      "la impermanencia de todo",
+      "la sabiduría del desapego"
+    ]
+  },
+  humildad: {
+    beginnings: [
+      "La humildad nos guía hacia",
+      "La verdadera grandeza yace en",
+      "El espíritu humilde encuentra",
+      "La sabiduría de la humildad revela",
+      "El camino del humilde conduce a"
+    ],
+    middles: [
+      "reconocer con gratitud",
+      "aceptar con sencillez",
+      "aprender de",
+      "servir mediante",
+      "comprender con modestia"
+    ],
+    endings: [
+      "la grandeza de la simplicidad",
+      "la verdad de nuestra naturaleza",
+      "la belleza de lo simple",
+      "la sabiduría del corazón modesto",
+      "la paz de la sencillez"
+    ]
+  }
+};
+
+function getRandomElement(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function generateQuote() {
+  const wordCount = parseInt(document.getElementById('wordCount').value);
+  const theme = document.getElementById('theme').value;
+  const quoteDisplay = document.getElementById('quoteDisplay');
+  quoteDisplay.classList.add('loading');
+  
+  setTimeout(() => {
+    let words = [];
+    let currentWordCount = 0;
+    
+    const themeContent = phrases[theme];
+    
+    // Comenzamos con una estructura básica
+    words.push(getRandomElement(themeContent.beginnings));
+    words.push(getRandomElement(themeContent.middles));
+    words.push(getRandomElement(themeContent.endings));
+    
+    // Contamos las palabras actuales
+    currentWordCount = words.join(' ').split(' ').length;
+    
+    // Complementamos la frase si es necesario
+    while (currentWordCount < wordCount) {
+      const additionalPhrase = getRandomElement(themeContent.middles) + " " + 
+                             getRandomElement(themeContent.endings);
+      words.push(additionalPhrase);
+      currentWordCount = words.join(' ').split(' ').length;
+    }
+    
+    // Ajustamos si nos pasamos de palabras
+    while (currentWordCount > wordCount) {
+      words.pop();
+      currentWordCount = words.join(' ').split(' ').length;
+    }
+    
+    quoteDisplay.textContent = words.join(' ') + '.';
+    quoteDisplay.classList.remove('loading');
+  }, 500);
+}
+</script>
+</body>
+</html>
